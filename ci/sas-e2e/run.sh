@@ -119,8 +119,10 @@ rc=${PIPESTATUS[0]}
 stop_all
 trap - EXIT
 
-# S7/S8 provoke ERROR lines of the authenticator on purpose; anything else is a finding
-errors=$(grep -E '^[0-9-]+ [0-9:,.]+ +ERROR ' "$LOG" | grep -v '\[nrw\.sit\.keycloak\.authenticator\.sas\.' || true)
+# S7/S8 provoke ERROR lines of the authenticator and the vendor wrapper on purpose;
+# anything else is a finding
+errors=$(grep -E '^[0-9-]+ [0-9:,.]+ +ERROR ' "$LOG" \
+  | grep -vE '\[(nrw\.sit\.keycloak\.authenticator\.sas|com\.safenet\.keycloak\.agent)\.' || true)
 if [ -n "$errors" ]; then
   echo "[e2e] unexpected ERROR lines in the Keycloak log:"; printf '%s\n' "$errors" | head -n 20
   rc=1
