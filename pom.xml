@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>nrw.sit.keycloak</groupId>
+    <artifactId>keycloak-sas-otp-authenticator</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>keycloak-sas-otp-authenticator</name>
+    <description>
+        SIT: OTP Form that validates the one-time passcode against Thales SafeNet
+        Authentication Service (SAS PCE) via the TokenValidator library shipped with the
+        SafeNet Agent for Keycloak. Uses Keycloak's standard login-otp.ftl, no Thales theme.
+    </description>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Override via -Dkeycloak.version=X.Y.Z -->
+        <keycloak.version>26.8.1</keycloak.version>
+        <!-- Thales SafeNet Agent 1.5.0 JARs, installed with thales/install.sh -->
+        <safenet.version>1.5.0</safenet.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-server-spi</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-server-spi-private</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-services</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-core</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Thales SafeNet Agent 1.5.0 - at runtime as separate JARs in providers/ -->
+        <dependency>
+            <groupId>com.safenet.keycloak.agent</groupId>
+            <artifactId>token-validator-adapter</artifactId>
+            <version>${safenet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.safenet.keycloak.agent</groupId>
+            <artifactId>commons</artifactId>
+            <version>${safenet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Test only: libraries Keycloak provides at runtime (same versions as Keycloak 26.8.1).
+             repack.sh strips commons-lang3 and JAXB from the Thales JAR, and the vendor AES-GCM
+             code needs BouncyCastle. -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.86</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.20.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.9</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.11.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>${project.artifactId}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Keycloak-Version>${keycloak.version}</Keycloak-Version>
+                        </manifestEntries>
+                    </archive>
+                    <finalName>${project.artifactId}-${project.version}-kc${keycloak.version}</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

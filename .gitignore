@@ -1,0 +1,11 @@
+target/
+*.class
+*.iml
+.idea/
+.DS_Store
+__pycache__/
+# decrypted Thales JARs (thales/decrypt.sh) - never commit in clear text
+thales/lib/
+*.jar
+.sas-e2e/
+.kc-compat/
